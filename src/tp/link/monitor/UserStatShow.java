@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -117,6 +119,13 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
             } catch (Exception ex)
             {
                 showException(ex);
+                try
+                {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex1)
+                {
+                    ex.printStackTrace();
+                }
             }
         }
     }
@@ -201,7 +210,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         c10.setCellValueFactory(new PropertyValueFactory<UserStat, Boolean>("active"));
         c10.setSortType(TableColumn.SortType.DESCENDING);
         c10.setSortable(true);
-        
+
         table.getSortOrder().clear();
         table.getSortOrder().addAll(c6, c10, c4);
         table.setRowFactory(new Callback<TableView, TableRow<UserStat>>()

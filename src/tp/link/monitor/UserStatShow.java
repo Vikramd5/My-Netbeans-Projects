@@ -10,8 +10,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -277,29 +275,26 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         a.setTitle(title);
         a.setContentText(msg);
         a.setHeaderText(null);
-        a.showAndWait();
+        a.show();
     }
 
     static void showException(Exception ex)
     {
-        Platform.runLater(new Runnable()
+        Platform.runLater(() ->
         {
-            public void run()
-            {
-                ex.printStackTrace();
-                StringWriter sw = new StringWriter();
-                ex.printStackTrace(new PrintWriter(sw));
-                String s = sw.toString();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Error: " + ex.getLocalizedMessage());
-                a.setTitle("Exception Occured");
-                a.setHeaderText(null);
-                TextArea t = new TextArea(s);
-                t.setWrapText(true);
-                t.setEditable(false);
-                a.getDialogPane().setExpandableContent(t);
-                a.showAndWait();
-            }
+            ex.printStackTrace();
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            String s = sw.toString();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setContentText("Error: " + ex.getLocalizedMessage());
+            a.setTitle("Exception Occured");
+            a.setHeaderText(null);
+            TextArea t = new TextArea(s);
+            t.setWrapText(true);
+            t.setEditable(false);
+            a.getDialogPane().setExpandableContent(t);
+            a.show();
         });
     }
 

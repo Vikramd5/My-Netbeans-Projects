@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -42,6 +43,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     boolean fetch = true;
     TableView table = new TableView();
     ContextMenu menu;
+    UserStatChart chart;
 
     public UserStatShow()
     {
@@ -51,13 +53,13 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     @Override
     public void start(Stage stage) throws Exception
     {
-
         addMenu();
         table.setContextMenu(menu);
         table.setItems(data);
         addColumns();
         table.sort();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         StackPane p = new StackPane();
         p.getChildren().add(table);
         stage.setTitle("TP-Link Monitor");
@@ -73,7 +75,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     @Override
     public void run()
     {
-        int c1 = 5, c2 = 1;
+        int c1 = 5, c2 = 5;
         HashMap<String, String> nmList = new HashMap<>();
         ArrayList<String> arpList = new ArrayList<String>();
         while (fetch)
@@ -109,8 +111,14 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     {
                         nm = "N/A";
                     }
-                    data.add(new UserStat(ip, mac, nm, totalPac, totalSz, curPac, curSz, id, arpList.contains(ip)));
+                    UserStat u = new UserStat(ip, mac, nm, totalPac, totalSz, curPac, curSz, id, arpList.contains(ip));
+                    data.add(u);
+                    if (chart != null && chart.isShowing())
+                    {
+                        chart.addUserData(u, c2);
+                    }
                 }
+                c2 += 5;
                 table.sort();
                 Thread.sleep(5000);
 
@@ -294,7 +302,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
             t.setWrapText(true);
             t.setEditable(false);
             a.getDialogPane().setExpandableContent(t);
-            a.show();
+            a.showAndWait();
         });
     }
 
@@ -302,7 +310,9 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     {
         MenuItem deleteMenu = new MenuItem("Delete");
         MenuItem deleteAllMenu = new MenuItem("Delete All");
-        menu = new ContextMenu(deleteMenu, deleteAllMenu);
+        MenuItem showChartMenu = new MenuItem("Show Chart");
+        menu = new ContextMenu(deleteMenu, deleteAllMenu, showChartMenu);
+
         deleteMenu.setOnAction(ev ->
         {
             UserStat s = (UserStat) table.getSelectionModel().getSelectedItem();
@@ -311,9 +321,28 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                 deleteStat(s.id);
             }
         });
+
         deleteAllMenu.setOnAction(ev ->
         {
             deleteStat(-1);
+        });
+
+        showChartMenu.setOnAction(ev ->
+        {
+            ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
+            if (selectedUsers != null && selectedUsers.size() > 0)
+            {
+                if (chart != null)
+                {
+                    chart.hide();
+                    chart=null;
+                }
+                chart = new UserStatChart(selectedUsers);
+                chart.show();
+            } else
+            {
+                showError("No Users selected!");
+            }
         });
     }
 }

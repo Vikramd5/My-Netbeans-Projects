@@ -310,8 +310,9 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     {
         MenuItem deleteMenu = new MenuItem("Delete");
         MenuItem deleteAllMenu = new MenuItem("Delete All");
-        MenuItem showChartMenu = new MenuItem("Show Chart");
-        menu = new ContextMenu(deleteMenu, deleteAllMenu, showChartMenu);
+        MenuItem showLChartMenu = new MenuItem("Show Line Chart");
+        MenuItem showAChartMenu = new MenuItem("Show Area Chart");
+        menu = new ContextMenu(deleteMenu, deleteAllMenu, showLChartMenu, showAChartMenu);
 
         deleteMenu.setOnAction(ev ->
         {
@@ -327,7 +328,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
             deleteStat(-1);
         });
 
-        showChartMenu.setOnAction(ev ->
+        showLChartMenu.setOnAction(ev ->
         {
             ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
             if (selectedUsers != null && selectedUsers.size() > 0)
@@ -335,9 +336,27 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                 if (chart != null)
                 {
                     chart.hide();
-                    chart=null;
+                    chart = null;
                 }
-                chart = new UserStatChart(selectedUsers);
+                chart = new UserStatChart(selectedUsers, true);
+                chart.show();
+            } else
+            {
+                showError("No Users selected!");
+            }
+        });
+
+        showAChartMenu.setOnAction(ev ->
+        {
+            ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
+            if (selectedUsers != null && selectedUsers.size() > 0)
+            {
+                if (chart != null)
+                {
+                    chart.hide();
+                    chart = null;
+                }
+                chart = new UserStatChart(selectedUsers, false);
                 chart.show();
             } else
             {

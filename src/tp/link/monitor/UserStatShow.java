@@ -44,6 +44,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     TableView table = new TableView();
     ContextMenu menu;
     UserStatChart chart;
+    int x = 5;
 
     public UserStatShow()
     {
@@ -75,7 +76,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     @Override
     public void run()
     {
-        int c1 = 5, c2 = 5;
+        int c1 = 5;
         HashMap<String, String> nmList = new HashMap<>();
         ArrayList<String> arpList = new ArrayList<String>();
         while (fetch)
@@ -115,10 +116,13 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     data.add(u);
                     if (chart != null && chart.isShowing())
                     {
-                        chart.addUserData(u, c2);
+                        chart.addUserData(u, x);
                     }
                 }
-                c2 += 5;
+                if (x > 0)
+                {
+                    x += 5;
+                }
                 table.sort();
                 Thread.sleep(5000);
 
@@ -356,8 +360,13 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     chart.hide();
                     chart = null;
                 }
+                x = 5;
                 chart = new UserStatChart(selectedUsers, false);
                 chart.show();
+                chart.addOnClose((WindowEvent event) ->
+                {
+                    x = -1;
+                });
             } else
             {
                 showError("No Users selected!");

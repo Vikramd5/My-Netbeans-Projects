@@ -15,6 +15,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -332,25 +333,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
             deleteStat(-1);
         });
 
-        showLChartMenu.setOnAction(ev ->
-        {
-            ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
-            if (selectedUsers != null && selectedUsers.size() > 0)
-            {
-                if (chart != null)
-                {
-                    chart.hide();
-                    chart = null;
-                }
-                chart = new UserStatChart(selectedUsers, true);
-                chart.show();
-            } else
-            {
-                showError("No Users selected!");
-            }
-        });
-
-        showAChartMenu.setOnAction(ev ->
+        EventHandler<ActionEvent> eh = ev ->
         {
             ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
             if (selectedUsers != null && selectedUsers.size() > 0)
@@ -361,7 +344,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     chart = null;
                 }
                 x = 5;
-                chart = new UserStatChart(selectedUsers, false);
+                chart = new UserStatChart(selectedUsers, ev.getSource() == showLChartMenu);
                 chart.show();
                 chart.addOnClose((WindowEvent event) ->
                 {
@@ -371,6 +354,8 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
             {
                 showError("No Users selected!");
             }
-        });
+        };
+        showLChartMenu.setOnAction(eh);
+        showAChartMenu.setOnAction(eh);
     }
 }

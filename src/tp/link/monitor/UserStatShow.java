@@ -317,7 +317,8 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         MenuItem deleteAllMenu = new MenuItem("Delete All");
         MenuItem showLChartMenu = new MenuItem("Show Line Chart");
         MenuItem showAChartMenu = new MenuItem("Show Area Chart");
-        menu = new ContextMenu(deleteMenu, deleteAllMenu, showLChartMenu, showAChartMenu);
+        MenuItem showSAChartMenu = new MenuItem("Show Stacked Area Chart");
+        menu = new ContextMenu(deleteMenu, deleteAllMenu, showLChartMenu, showAChartMenu, showSAChartMenu);
 
         deleteMenu.setOnAction(ev ->
         {
@@ -344,7 +345,18 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     chart = null;
                 }
                 x = 5;
-                chart = new UserStatChart(selectedUsers, ev.getSource() == showLChartMenu);
+                int cType;
+                if (ev.getSource() == showLChartMenu)
+                {
+                    cType = UserStatChart.LINE_CHART;
+                } else if (ev.getSource() == showAChartMenu)
+                {
+                    cType = UserStatChart.AREA_CHART;
+                } else
+                {
+                    cType = UserStatChart.STACKED_AREA_CHART;
+                }
+                chart = new UserStatChart(selectedUsers, cType);
                 chart.show();
                 chart.addOnClose((WindowEvent event) ->
                 {
@@ -357,5 +369,6 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         };
         showLChartMenu.setOnAction(eh);
         showAChartMenu.setOnAction(eh);
+        showSAChartMenu.setOnAction(eh);
     }
 }

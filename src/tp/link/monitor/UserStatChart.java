@@ -11,9 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedAreaChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -31,17 +31,23 @@ public class UserStatChart
     javafx.scene.chart.XYChart<Number, Number> chart;
     Stage stage;
     int maxSize = 10000;
+    public static final int LINE_CHART = 0;
+    public static final int AREA_CHART = 1;
+    public static final int STACKED_AREA_CHART = 2;
 
-    public UserStatChart(ObservableList<UserStat> selectedUsers, boolean lineChart)
+    public UserStatChart(ObservableList<UserStat> selectedUsers, int chartType)
     {
         xAxis = new NumberAxis();
         yAxis = new NumberAxis();
-        if (lineChart)
+        if (chartType == LINE_CHART)
         {
             chart = new LineChart<>(xAxis, yAxis);
-        } else
+        } else if (chartType == AREA_CHART)
         {
             chart = new AreaChart<>(xAxis, yAxis);
+        } else
+        {
+            chart = new StackedAreaChart<>(xAxis, yAxis);
         }
         userDataMap = new HashMap<>(selectedUsers.size());
         for (UserStat u : selectedUsers)
@@ -96,9 +102,9 @@ public class UserStatChart
     {
         return stage.isShowing();
     }
-    
+
     public void addOnClose(EventHandler<WindowEvent> e)
     {
-    stage.setOnHidden(e);
+        stage.setOnHidden(e);
     }
 }

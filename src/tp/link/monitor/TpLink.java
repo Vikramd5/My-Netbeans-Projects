@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.productivity.java.syslog4j.Syslog;
@@ -19,11 +22,11 @@ import org.productivity.java.syslog4j.SyslogIF;
  *
  * @author Vikram
  */
-public class TpLink
-{
+public class TpLink {
 
-    static HttpURLConnection getConnecttion(String call, String qr) throws MalformedURLException, IOException
-    {
+    static HashMap<String, String> macLookupTable = new HashMap<>();
+
+    static HttpURLConnection getConnecttion(String call, String qr) throws MalformedURLException, IOException {
         URL u = new URL("http://192.168.0.1/userRpm/" + call + ".htm?" + qr);
         HttpURLConnection con = (HttpURLConnection) u.openConnection();
         con.setRequestProperty("Referer", "http://192.168.0.1/userRpm/SystemStatisticRpm.htm");
@@ -31,8 +34,7 @@ public class TpLink
         return con;
     }
 
-    static Matcher getMatcher(String call, String qr, String pattern) throws IOException
-    {
+    static Matcher getMatcher(String call, String qr, String pattern) throws IOException {
         HttpURLConnection con = getConnecttion(call, qr);
         Scanner sc = new Scanner(con.getInputStream());
         sc.useDelimiter("\\)\\;");
@@ -44,40 +46,53 @@ public class TpLink
         return m;
     }
 
-    static int toKB(String s)
-    {
+    static int toKB(String s) {
         return Integer.parseInt(s) / 1024;
     }
 
-    static String toSize(long n)
-    {
-        if (n < 1024)
-        {
+    static String toSize(long n) {
+        if (n < 1024) {
             return String.format("%d Bytes", n);
-        } else if (n < 1024000)
-        {
+        } else if (n < 1024000) {
             return String.format("%.2f KB", n / 1024.0);
-        } else if (n < 1024000000)
-        {
+        } else if (n < 1024000000) {
             return String.format("%.2f MB", n / 1024000.0);
-        } else
-        {
+        } else {
             return String.format("%.2f GB", n / 1024000000.0);
         }
     }
 
-    static String toSize(String s)
-    {
+    static String toSize(String s) {
         long n = Long.parseLong(s);
         return toSize(n);
     }
 
-    static SyslogIF getLogger()
-    {
+    static SyslogIF getLogger() {
         SyslogIF l = Syslog.getInstance("udp");
         l.getConfig().setHost("localhost");
         l.getConfig().setPort(514);
         l.getConfig().setLocalName("TP-Link Monitor");
         return l;
+    }
+
+    static String lookupMAC(String mac) {
+        String shortMac = mac.substring(0, 8);
+        if (macLookupTable.containsKey(shortMac)) {
+            return macLookupTable.get(shortMac);
+        } else {
+            String ven = getVendor(mac);
+            macLookupTable.put(shortMac, ven);
+            return ven;
+        }
+    }
+
+    private static String getVendor(String mac) {
+
+        try {
+            return new Scanner(new URL("http://api.macvendors.com/" + mac).openStream()).useDelimiter("\\A").next();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return "N/A";
     }
 }

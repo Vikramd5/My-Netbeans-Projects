@@ -36,8 +36,7 @@ import javafx.util.Callback;
  *
  * @author Vikram
  */
-public class UserStatShow extends Application implements Runnable, EventHandler<WindowEvent>
-{
+public class UserStatShow extends Application implements Runnable, EventHandler<WindowEvent> {
 
     Scene scene;
     ObservableList<UserStat> data;
@@ -47,14 +46,12 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     UserStatChart chart;
     int x = 5;
 
-    public UserStatShow()
-    {
+    public UserStatShow() {
         data = FXCollections.observableArrayList();
     }
 
     @Override
-    public void start(Stage stage) throws Exception
-    {
+    public void start(Stage stage) throws Exception {
         addMenu();
         table.setContextMenu(menu);
         table.setItems(data);
@@ -75,17 +72,13 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         int c1 = 5;
         HashMap<String, String> nmList = new HashMap<>();
         ArrayList<String> arpList = new ArrayList<String>();
-        while (fetch)
-        {
-            try
-            {
-                if (c1 == 5)
-                {
+        while (fetch) {
+            try {
+                if (c1 == 5) {
                     fillNameList(nmList);
                     c1 = 0;
                 }
@@ -96,8 +89,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                 System.out.println("*******************************************************************************************************");
                 System.out.printf("%3s %15s    %17s %15s %15s %15s %15s\n", "ID", "IP", "mac", "totalPac", "totalSize", "curPac", "curSize");
                 data.clear();
-                while (m.find())
-                {
+                while (m.find()) {
                     String ip, mac;
                     long totalPac, totalSz, curPac, curSz;
                     ip = m.group(2);
@@ -109,52 +101,43 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
                     int id = Integer.parseInt(m.group(1));
                     System.out.printf("%3d %15s    %17s %15s %15s %15s %15s\n", id, ip, mac, totalPac, TpLink.toSize(totalSz), curPac, TpLink.toSize(curSz));
                     String nm = nmList.get(ip);
-                    if (nm == null)
-                    {
+                    if (nm == null) {
                         nm = "N/A";
                     }
                     UserStat u = new UserStat(ip, mac, nm, totalPac, totalSz, curPac, curSz, id, arpList.contains(ip));
                     data.add(u);
-                    if (chart != null && chart.isShowing())
-                    {
+                    if (chart != null && chart.isShowing()) {
                         chart.addUserData(u, x);
                     }
                 }
-                if (x > 0)
-                {
+                if (x > 0) {
                     x += 5;
                 }
                 table.sort();
                 Thread.sleep(5000);
 
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 showException(ex);
-                try
-                {
+                try {
                     Thread.sleep(10000);
-                } catch (InterruptedException ex1)
-                {
+                } catch (InterruptedException ex1) {
                     ex.printStackTrace();
                 }
             }
         }
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void handle(WindowEvent t)
-    {
+    public void handle(WindowEvent t) {
         fetch = false;
         System.exit(0);
     }
 
-    private void fillNameList(HashMap<String, String> nmList) throws IOException
-    {
+    private void fillNameList(HashMap<String, String> nmList) throws IOException {
         String p = "\"(.+)\",\\n"
                 + "\"[0-9A-F-]+\",\\n"
                 + "\"([\\d\\.]+)\",\\n"
@@ -163,8 +146,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         Matcher m = TpLink.getMatcher("AssignedIpAddrListRpm", "", p);
         nmList.clear();
         System.out.printf("%30s   %15s\n", "IP Address", "Host Name");
-        while (m.find())
-        {
+        while (m.find()) {
             String ip = m.group(2), nm = m.group(1);
             System.out.printf("%30s   %15s\n", ip, nm);
             nmList.put(ip, nm);
@@ -172,23 +154,20 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
 
     }
 
-    private void fillArpList(ArrayList<String> arpList) throws IOException
-    {
+    private void fillArpList(ArrayList<String> arpList) throws IOException {
         String p = "\\n\\d+,\"[0-9A-F-]+\",\"([\\d\\.]+)\",";
         System.out.println("\n\nRefreshing the ARP list");
         Matcher m = TpLink.getMatcher("LanArpBindingListRpm", "", p);
         arpList.clear();
         System.out.printf("%15s\n", "IP Address");
-        while (m.find())
-        {
+        while (m.find()) {
             String ip = m.group(1);
             System.out.printf("%15s\n", ip);
             arpList.add(ip);
         }
     }
 
-    private void addColumns()
-    {
+    private void addColumns() {
         TableColumn c1 = new TableColumn("IP Address");
         c1.setCellValueFactory(new PropertyValueFactory<UserStat, String>("ip"));
         c1.setMinWidth(100);
@@ -221,69 +200,57 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         c10.setCellValueFactory(new PropertyValueFactory<UserStat, Boolean>("active"));
         c10.setSortType(TableColumn.SortType.DESCENDING);
         c10.setSortable(true);
+        TableColumn c11 = new TableColumn("Vendor");
+        c11.setCellValueFactory(new PropertyValueFactory<UserStat, String>("vendor"));
+        c11.setMinWidth(120);
 
         table.getSortOrder().clear();
         table.getSortOrder().addAll(c6, c10, c4);
-        table.setRowFactory(new Callback<TableView, TableRow<UserStat>>()
-        {
-            public TableRow<UserStat> call(TableView tableObj)
-            {
-                return new TableRow<UserStat>()
-                {
+        table.setRowFactory(new Callback<TableView, TableRow<UserStat>>() {
+            public TableRow<UserStat> call(TableView tableObj) {
+                return new TableRow<UserStat>() {
                     @Override
-                    protected void updateItem(UserStat t, boolean empty)
-                    {
+                    protected void updateItem(UserStat t, boolean empty) {
                         super.updateItem(t, empty); //To change body of generated methods, choose Tools | Templates.
-                        if (!empty && !t.isActive())
-                        {
+                        if (!empty && !t.isActive()) {
                             this.setStyle("-fx-background-color: #F88;");
-                        } else
-                        {
+                        } else {
                             this.setStyle("");
                         }
                     }
                 };
             }
         });
-        table.getColumns().addAll(c1, c8, c7, c9, c2, c3, c5, c4, c6, c10);
+        table.getColumns().addAll(c1, c8, c7, c9, c2, c11, c3, c5, c4, c6, c10);
     }
 
-    private void deleteStat(int id)
-    {
+    private void deleteStat(int id) {
         System.out.println("Deleting " + id);
-        try
-        {
+        try {
             String qr = (id == -1 ? "DeleteAll=All" : ("delone=" + id)) + "&interval=5&autoRefresh=0&Num_per_page=50&Goto_page=1&sortType=1&Num_per_page=50&Goto_page=1";
             int r = TpLink.getConnecttion("SystemStatisticRpm", qr).getResponseCode();
-            if (r == 200)
-            {
-                if (id == -1)
-                {
+            if (r == 200) {
+                if (id == -1) {
                     table.getItems().clear();
                 }
                 showMessage("Deleted Successfully");
-            } else
-            {
+            } else {
                 showError("Failed to delete! Response code:  " + r);
             }
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             showException(ex);
         }
     }
 
-    static void showMessage(String msg)
-    {
+    static void showMessage(String msg) {
         showAlert(Alert.AlertType.INFORMATION, msg, "Message");
     }
 
-    static void showError(String msg)
-    {
+    static void showError(String msg) {
         showAlert(Alert.AlertType.INFORMATION, msg, "Error");
     }
 
-    static private void showAlert(Alert.AlertType t, String msg, String title)
-    {
+    static private void showAlert(Alert.AlertType t, String msg, String title) {
         Alert a = new Alert(t);
         a.setTitle(title);
         a.setContentText(msg);
@@ -291,10 +258,9 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         a.show();
     }
 
-    static void showException(Exception ex)
-    {
-        Platform.runLater(() ->
-        {
+    static void showException(Exception ex) {
+        Platform.runLater(()
+                -> {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
@@ -311,8 +277,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         });
     }
 
-    private void addMenu()
-    {
+    private void addMenu() {
         MenuItem deleteMenu = new MenuItem("Delete");
         MenuItem deleteAllMenu = new MenuItem("Delete All");
         MenuItem showLChartMenu = new MenuItem("Show Line Chart");
@@ -320,50 +285,43 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         MenuItem showSAChartMenu = new MenuItem("Show Stacked Area Chart");
         menu = new ContextMenu(deleteMenu, deleteAllMenu, showLChartMenu, showAChartMenu, showSAChartMenu);
 
-        deleteMenu.setOnAction(ev ->
-        {
+        deleteMenu.setOnAction(ev
+                -> {
             UserStat s = (UserStat) table.getSelectionModel().getSelectedItem();
-            if (s != null)
-            {
-                deleteStat(s.id);
+            if (s != null) {
+                deleteStat(s.getId());
             }
         });
 
-        deleteAllMenu.setOnAction(ev ->
-        {
+        deleteAllMenu.setOnAction(ev
+                -> {
             deleteStat(-1);
         });
 
-        EventHandler<ActionEvent> eh = ev ->
-        {
+        EventHandler<ActionEvent> eh = ev
+                -> {
             ObservableList<UserStat> selectedUsers = table.getSelectionModel().getSelectedItems();
-            if (selectedUsers != null && selectedUsers.size() > 0)
-            {
-                if (chart != null)
-                {
+            if (selectedUsers != null && selectedUsers.size() > 0) {
+                if (chart != null) {
                     chart.hide();
                     chart = null;
                 }
                 x = 5;
                 int cType;
-                if (ev.getSource() == showLChartMenu)
-                {
+                if (ev.getSource() == showLChartMenu) {
                     cType = UserStatChart.LINE_CHART;
-                } else if (ev.getSource() == showAChartMenu)
-                {
+                } else if (ev.getSource() == showAChartMenu) {
                     cType = UserStatChart.AREA_CHART;
-                } else
-                {
+                } else {
                     cType = UserStatChart.STACKED_AREA_CHART;
                 }
                 chart = new UserStatChart(selectedUsers, cType);
                 chart.show();
-                chart.addOnClose((WindowEvent event) ->
-                {
+                chart.addOnClose((WindowEvent event)
+                        -> {
                     x = -1;
                 });
-            } else
-            {
+            } else {
                 showError("No Users selected!");
             }
         };

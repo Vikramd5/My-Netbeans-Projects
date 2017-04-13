@@ -9,16 +9,14 @@ package tp.link.monitor;
  *
  * @author Vikram
  */
-public class UserStat
-{
+public class UserStat {
 
-    private String ip, mac, name;
-    private long totalPac, totalSz, curPac, curSz;
-    int id;
-    private boolean active;
+    final private String ip, mac, name, vendor;
+    final private long totalPac, totalSz, curPac, curSz;
+    final int id;
+    final private boolean active;
 
-    public UserStat(String ip, String mac, String name, long totalPac, long totalSz, long curPac, long curSz, int id, boolean active)
-    {
+    public UserStat(String ip, String mac, String name, long totalPac, long totalSz, long curPac, long curSz, int id, boolean active) {
         this.ip = ip;
         this.mac = mac;
         this.name = name;
@@ -28,96 +26,55 @@ public class UserStat
         this.curSz = curSz;
         this.id = id;
         this.active = active;
+        vendor = TpLink.lookupMAC(mac);
     }
 
-    public boolean isActive()
-    {
-        return active;
-    }
-
-    public void setActive(boolean active)
-    {
-        this.active = active;
-    }
-
-    public String getIp()
-    {
+    public String getIp() {
         return ip;
     }
 
-    public void setIp(String ip)
-    {
-        this.ip = ip;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getMac()
-    {
+    public String getMac() {
         return mac;
     }
 
-    public void setMac(String mac)
-    {
-        this.mac = mac;
+    public String getName() {
+        return name;
     }
 
-    public long getTotalPac()
-    {
+    public long getTotalPac() {
         return totalPac;
     }
 
-    public void setTotalPac(long totalPac)
-    {
-        this.totalPac = totalPac;
-    }
-
-    public long getTotalSz()
-    {
+    public long getTotalSz() {
         return totalSz;
     }
 
-    public void setTotalSz(long totalSz)
-    {
-        this.totalSz = totalSz;
-    }
-
-    public long getCurPac()
-    {
+    public long getCurPac() {
         return curPac;
     }
 
-    public void setCurPac(long curPac)
-    {
-        this.curPac = curPac;
-    }
-
-    public long getCurSz()
-    {
+    public long getCurSz() {
         return curSz;
     }
 
-    public void setCurSz(long curSz)
-    {
-        this.curSz = curSz;
+    public int getId() {
+        return id;
     }
 
-    public String getSzCurSz()
-    {
+    public boolean isActive() {
+        return active;
+    }
+
+    public String getSzCurSz() {
         return TpLink.toSize(curSz);
     }
 
-    public String getSzTotalSz()
-    {
+    public String getSzTotalSz() {
         return TpLink.toSize(totalSz);
+    }
+
+    public String getVendor() {
+        return vendor;
     }
 
 }

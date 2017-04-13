@@ -18,6 +18,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.productivity.java.syslog4j.SyslogIF;
+import org.productivity.java.syslog4j.impl.message.pci.PCISyslogMessage;
 
 /**
  *
@@ -34,9 +36,12 @@ public class UserStatChart
     public static final int LINE_CHART = 0;
     public static final int AREA_CHART = 1;
     public static final int STACKED_AREA_CHART = 2;
+    SyslogIF l = TpLink.getLogger();
 
     public UserStatChart(ObservableList<UserStat> selectedUsers, int chartType)
     {
+
+        l.debug("Creating chart object type: " + chartType);
         xAxis = new NumberAxis();
         yAxis = new NumberAxis();
         if (chartType == LINE_CHART)
@@ -80,6 +85,7 @@ public class UserStatChart
                 int spd = (int) (s / 1024);
                 ObservableList<XYChart.Data<Number, Number>> data = userDataMap.get(u.getIp()).getData();
                 data.add(new XYChart.Data<>(x, spd));
+                l.info("event=Speed_Info IP=" + u.getIp() + " Speed=" + spd);
                 if (data.size() > maxSize)
                 {
                     data.remove(0);
@@ -96,6 +102,7 @@ public class UserStatChart
     public void hide()
     {
         stage.close();
+        l.debug(new PCISyslogMessage("Vikram", "stageClose", "Closed", "The chart stage has been closed"));
     }
 
     public boolean isShowing()

@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.productivity.java.syslog4j.Syslog;
+import org.productivity.java.syslog4j.SyslogIF;
 
 /**
  *
@@ -68,5 +70,14 @@ public class TpLink
     {
         long n = Long.parseLong(s);
         return toSize(n);
+    }
+
+    static SyslogIF getLogger()
+    {
+        SyslogIF l = Syslog.getInstance("udp");
+        l.getConfig().setHost("localhost");
+        l.getConfig().setPort(514);
+        l.getConfig().setLocalName("TP-Link Monitor");
+        return l;
     }
 }

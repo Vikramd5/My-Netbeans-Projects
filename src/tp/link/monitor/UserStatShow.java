@@ -207,6 +207,7 @@ public class UserStatShow extends Application implements Runnable, EventHandler<
         table.getSortOrder().clear();
         table.getSortOrder().addAll(c6, c10, c4);
         table.setRowFactory(new Callback<TableView, TableRow<UserStat>>() {
+            @Override
             public TableRow<UserStat> call(TableView tableObj) {
                 return new TableRow<UserStat>() {
                     @Override
